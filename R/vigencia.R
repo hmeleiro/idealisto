@@ -104,7 +104,7 @@ vigencia <- function(df, ruta = NULL) {
   df$rebaja_agrup[df$rebaja < -50 & df$rebaja >= -100] <- "Rebaja de entre 51€ y 100€" 
   df$rebaja_agrup[df$rebaja < -100] <- "Rebaja de más de 101€" 
   
-  write_csv(x = df, path = paste0("~/","idealisto",Sys.time(),".csv"))
+  write_csv(x = df, path = paste0("~/","idealisto_",Sys.Date(),".csv"))
   
   stop <- Sys.time()
   diff <- stop - start

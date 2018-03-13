@@ -6,8 +6,7 @@
 #' @param ruta A valid path in your computer where you want to create the csv file.
 #' @return It returns a csv in the specified path
 #' @export
-idealisto <- function(url, area, ruta = "~/idealisto.csv") {
-  
+idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
   start <- Sys.time()
   
   list.of.packages <- c("stringr", "rvest", "httr")
@@ -164,14 +163,15 @@ idealisto <- function(url, area, ruta = "~/idealisto.csv") {
   p <- length(links_anuncios_tot)
   
   print(paste("Idealisto ha extraido las urls de", p, "anuncios."))
-  print(paste("Ahora Idealisto comenzará a extraer la información de esos", p, "anuncios. Pero antes vamos a descansar durante 30 segundos"))
+  print(paste("Ahora Idealisto comenzará a extraer la información de esos", n, "anuncios. Pero antes vamos a descansar durante 30 segundos"))
   
   Sys.sleep(30)
   
   
   start_2 <- Sys.time()
   
-  repeat {
+  ###### 
+  for (p in 1:length(links_anuncios_tot)) {     
     x <- GET(links_anuncios_tot[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))
     
     titulo <- x %>% read_html() %>% html_nodes(".main-info__title-main") %>% html_text()
@@ -202,7 +202,6 @@ idealisto <- function(url, area, ruta = "~/idealisto.csv") {
       anunciante <- "Particular"
     }
     
-    #calle <- as.character(ubi[str_detect(ubi, pattern = "Calle ") == TRUE])
     calle <- ubi[1]
     distrito <- as.character(ubi[str_detect(ubi, pattern = "Distrito ") == TRUE])
     barrio <- as.character(ubi[str_detect(ubi, pattern = "Barrio ") == TRUE])
@@ -235,16 +234,17 @@ idealisto <- function(url, area, ruta = "~/idealisto.csv") {
     line <- data_frame(titulo, distrito, barrio, calle, precio, precio_m2, metros, habit, descrip, anunciante, agencia, links_anuncios_tot[p], fecha)
     print(line)
     
-    process <- 100 - ((p/length(links_anuncios_tot))*100)
+    n <- n - 1
+    p <- p + 1
+    process <- 100 - ((n/length(links_anuncios_tot))*100)
     print(paste0("Idealisto lleva descargados el ", round(process, digits = 1),"% de los anuncios."))
     
     
     write.table(line, file = ruta, sep = ",", append = TRUE, quote = TRUE, col.names = FALSE, row.names = FALSE, na = "")
     
-    p <- p - 1
-    if (p <= 0) {
-      break
-    }
+    #########
+    
+    
     
     if (Sys.time() > start_2 + 420) {
       stop_t <- sample(x = 100:120, size = 1)
