@@ -6,12 +6,12 @@
 #' @return It returns a data.frame object with the new columns.
 #' @export
 vigencia <- function(df, ruta = NULL) {
-  list.of.packages <- c("tidyverse", "rvest", "httr")
+  list.of.packages <- c("stringr", "rvest", "httr")
   new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
   if(length(new.packages)>0) {install.packages(new.packages)}
   
   
-  library(tidyverse)
+  library(stringr)
   library(rvest)
   library(httr)
   
