@@ -1,6 +1,6 @@
 #' Scrap idealista website.
 #' 
-#' This function scraps spanish idealista (a real estate website) and downloads all the 'for sale' ads in the given province, city, disctrict or neighborhood.
+#' This function scraps idealista (a spanish real estate website) and downloads all the 'for sale' ads in the given province, city, district or neighborhood.
 #' @param url An idealisto website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.
 #' @param area The type of area you want to scrap. It can take these values: 'Provincia', 'Ciudad', 'Distrito' or 'Barrio'.
 #' @param ruta A valid path in your computer where you want to create the csv file.

@@ -1,7 +1,7 @@
 #' Scrap idealista website.
 #' 
-#' This function scraps spanish idealista (a real estate website) and downloads a maximum of 1.800 rent ads in the given province, city, disctrict or neighborhood. So if you want to scrap an area that has more than 1.800 ads use idealisto function.
-#' @param url An idealisto website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.
+#' This function scraps idealista (a spanish real estate website) and downloads a maximum of 1.800 rent ads in the given province, city, district or neighborhood. So if you want to scrap an area that has more than 1.800 ads use idealisto function.
+#' @param url An idealista website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.
 #' @param ruta A valid path in your computer where you want to create the csv file.
 #' @return It returns a csv in the specified path
 #' @export

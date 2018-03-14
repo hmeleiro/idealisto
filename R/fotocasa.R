@@ -1,12 +1,11 @@
-#' Scrap idealista website.
+#' Scrap Fotocasa website.
 #' 
-#' This function scraps spanish idealista (a real estate website) and downloads all the rent ads in the given province, city, disctrict or neighborhood.
-#' @param url An idealisto website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.
-#' @param area The type of area you want to scrap. It can take these values: 'Provincia', 'Ciudad', 'Distrito' or 'Barrio'.
+#' This function scraps Fotocasa (a spanish real estate website) and downloads all the rent ads in the given province, city, disctrict or neighborhood.
+#' @param url A Fotocasa website url that links to the area you want to scrap, e.g. 'https://www.fotocasa.es/es/alquiler/casas/madrid-capital/todas-las-zonas/l'.
 #' @param ruta A valid path in your computer where you want to create the csv file.
 #' @return It returns a csv in the specified path
 #' @export
-fotocasa <- function(url) {
+fotocasa <- function(url, ruta = "~/fotocasa.csv") {
   start <- Sys.time()
   
   list.of.packages <- c("stringr", "rvest", "httr")
@@ -66,7 +65,7 @@ fotocasa <- function(url) {
   #line <- data_frame("Titulo", "Distrito", "Barrio", "calle", "Precio", "Precio_m2", "Superficie", "Habitaciones", "Descripcion", "Anunciante", "Agencia", "Url", "fecha")
   
   
-  write.table(line, file = "/Users/HECTOR/Desktop/prueba.csv", sep = ",", quote = FALSE, col.names = FALSE, row.names = FALSE, na = "")
+  write.table(line, file = ruta, sep = ",", quote = FALSE, col.names = FALSE, row.names = FALSE, na = "")
   
   
   start_2 <- Sys.time()
@@ -197,7 +196,7 @@ fotocasa <- function(url) {
                        link)
     print(line)
     
-    write.table(line, file = "~/prueba.csv", sep = ",", append = TRUE, quote = TRUE, col.names = FALSE, row.names = FALSE, na = "", dec = ".")
+    write.table(line, file = ruta, sep = ",", append = TRUE, quote = TRUE, col.names = FALSE, row.names = FALSE, na = "", dec = ".")
     
     if (Sys.time() > start_2 + 420) {
       stop_t <- sample(x = 90:110, size = 1)
