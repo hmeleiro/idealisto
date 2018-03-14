@@ -63,7 +63,7 @@ idealisto_fast <- function(url, ruta = "~/idealisto_fast.csv") {
   
   links_anuncios_tot <<- links_anuncios_tot
   
-  line <- data_frame("Titulo", "Distrito", "Barrio", "calle", "Precio", "Precio_m2", "Superficie", "Habitaciones", "Descripcion", "Anunciante", "Agencia", "Url", "fecha")
+  line <- data.frame("Titulo", "Distrito", "Barrio", "calle", "Precio", "Precio_m2", "Superficie", "Habitaciones", "Descripcion", "Anunciante", "Agencia", "Url", "fecha")
   
   write.table(line, file = ruta, sep = ",", quote = FALSE, col.names = FALSE, row.names = FALSE, na = "")
   
@@ -140,7 +140,7 @@ idealisto_fast <- function(url, ruta = "~/idealisto_fast.csv") {
     precio_m2 <- precio/metros
     
     
-    line <- data_frame(titulo, distrito, barrio, calle, precio, precio_m2, metros, habit, descrip, anunciante, agencia, links_anuncios_tot[p], fecha)
+    line <- data.frame(titulo, distrito, barrio, calle, precio, precio_m2, metros, habit, descrip, anunciante, agencia, links_anuncios_tot[p], fecha)
     print(line)
     
     n <- n - 1
