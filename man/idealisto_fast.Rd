@@ -11,6 +11,7 @@ idealisto_fast(url, ruta = "~/idealisto_fast.csv")
 
 \item{ruta}{A valid path in your computer where you want to create the csv file.}
 
+\item{area}{The type of area you want to scrap. It can take these values: 'Provincia', 'Ciudad', 'Distrito' or 'Barrio'.}
 }
 \value{
 It returns a csv in the specified path
