@@ -7,7 +7,7 @@
 idealisto_alter(url, area, ruta = "~/idealisto_alter.csv")
 }
 \arguments{
-\item{url}{An idealisto website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.}
+\item{url}{An idealista website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.}
 
 \item{area}{The type of area you want to scrap. It can take these values: 'Provincia', 'Ciudad', 'Distrito' or 'Barrio'.}
 
@@ -17,5 +17,8 @@ idealisto_alter(url, area, ruta = "~/idealisto_alter.csv")
 It returns a csv in the specified path
 }
 \description{
-This function scraps spanish idealista (a real estate website) and downloads all the rent ads in the given province, city, disctrict or neighborhood.
+This function scraps idealista (a spanish real estate website) and downloads all the rent ads in the given province, city, disctrict or neighborhood.
+}
+\details{
+This is and alternative to idealisto function that has one big for loop instead of a repeat one.
 }

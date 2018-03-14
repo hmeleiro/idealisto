@@ -7,15 +7,13 @@
 idealisto_fast(url, ruta = "~/idealisto_fast.csv")
 }
 \arguments{
-\item{url}{An idealisto website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.}
+\item{url}{An idealista website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.}
 
 \item{ruta}{A valid path in your computer where you want to create the csv file.}
-
-\item{area}{The type of area you want to scrap. It can take these values: 'Provincia', 'Ciudad', 'Distrito' or 'Barrio'.}
 }
 \value{
 It returns a csv in the specified path
 }
 \description{
-This function scraps spanish idealista (a real estate website) and downloads a maximum of 1.800 rent ads in the given province, city, disctrict or neighborhood. So if you want to scrap an area that has more than 1.800 ads use idealisto function.
+This function scraps idealista (a spanish real estate website) and downloads a maximum of 1.800 rent ads in the given province, city, district or neighborhood. So if you want to scrap an area that has more than 1.800 ads use idealisto function.
 }
