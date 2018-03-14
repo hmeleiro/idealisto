@@ -5,6 +5,7 @@ Version: 0.1
 Author: Hector Meleiro <hmeleiros@gmail.com>
 Maintainer: Hector Meleiro <hmeleiros@gmail.com>
 Depends: R (>= 3.0.1)
+Imports: stringr, httr, rvest
 License: MIT
 LazyData: true
 RoxygenNote: 6.0.1

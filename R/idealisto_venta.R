@@ -1,15 +1,12 @@
 #' Scrap idealista website.
 #' 
-#' This function scraps spanish idealista (a real estate website) and downloads all the rent ads in the given province, city, disctrict or neighborhood.
-#' 
-#' This is and alternative to idealisto function that has one big for loop instead of a repeat one.
-#' 
+#' This function scraps spanish idealista (a real estate website) and downloads all the 'for sale' ads in the given province, city, disctrict or neighborhood.
 #' @param url An idealisto website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.
 #' @param area The type of area you want to scrap. It can take these values: 'Provincia', 'Ciudad', 'Distrito' or 'Barrio'.
 #' @param ruta A valid path in your computer where you want to create the csv file.
 #' @return It returns a csv in the specified path
 #' @export
-idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
+idealisto_venta <- function(url, area, ruta) {
   start <- Sys.time()
   
   list.of.packages <- c("stringr", "rvest", "httr")
@@ -208,6 +205,8 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     
     if (length(descrip) == 0) {
       descrip <- "Sin descripción"
+    } else if (length(descrip) > 1) {
+      descrip <- descrip[1]
     }
     
     if (length(agencia) == 0) {
@@ -219,8 +218,14 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     }
     
     calle <- ubi[1]
-    distrito <- links_anuncios_tot$distrito[p]
     barrio <- as.character(ubi[str_detect(ubi, pattern = "Barrio ") == TRUE])
+    
+    if (area == "Ciudad" | area == "ciudad") {
+      distrito <- links_anuncios_tot$distrito[p]
+    } else {
+      distrito <- as.character(ubi[str_detect(ubi, pattern = "Distrito") == TRUE])
+      distrito <- str_replace_all(string = distrito, pattern = "Distrito ", replacement = "")
+    }
     
     
     if (length(distrito) == 0) {
@@ -229,18 +234,19 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     
     if (length(barrio) == 0) {
       barrio <- NA
+    } else if (length(barrio) > 1) {
+      barrio <- barrio[2]
     }
     
     if (length(calle) == 0) {
       calle <- NA
     }
     
-    metros <- str_extract(pattern = "..m²|...m²|....m²|.....m²|......m²|.......m²|........m²|.........m²|..........m²", string = info)
+    metros <- str_extract(pattern = "..m²|...m²|....m²|.....m²|......m²|.......m²|........m²|.........m²|..........m²", string = info[1])
     metros <- str_replace_all(string = metros, pattern = " m²| |\\.", replacement = "")
     metros <- as.numeric(metros)
-    habit <- as.integer(str_replace_all(pattern = " hab.", replacement = "", string = str_extract(pattern = ".hab.|..hab.", string = info)))
-    #distrito <- str_replace_all(string = distrito, pattern = "Distrito ", replacement = "")
-    precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = ""))
+    habit <- as.integer(str_replace_all(pattern = " hab\\.", replacement = "", string = str_extract(pattern = ".hab\\.|..hab\\.", string = info[1])))
+    precio <- as.integer(str_replace_all(string = precio[1], pattern = " eur|\\.", replacement = ""))
     descrip <- str_replace_all(descrip, pattern = '\"', "")
     fecha <- Sys.Date()
     
