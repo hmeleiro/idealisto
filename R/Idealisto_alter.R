@@ -102,11 +102,10 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
       x <- GET(url_distris_tot[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))  ##   Creo q para pasar las páginas en el GET
       sig_pag <- x %>% read_html() %>% html_nodes(".icon-arrow-right-after") %>% html_attr(name = "href", default = NA)
       
-      
       if (length(sig_pag) == 0) {
         sig_pag <- NA
       } else {
-        sig_pag_tot <- c(sig_pag,sig_pag_tot)
+        sig_pag_tot <- c(sig_pag, sig_pag_tot)
       }
       
       p <- p - 1
@@ -118,8 +117,9 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     }
     
     url_distris_tot <- paste0("https://www.idealista.com", sig_pag_tot)
+    print(url_distris_tot)
     
-    if (url_distris_tot == "https://www.idealista.com") {
+    if (isTRUE(url_distris_tot == "https://www.idealista.com")) {
       break
     }
     
@@ -141,7 +141,11 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
   links_anuncios_tot <- data.frame(anuncio = NA, distrito = NA)
   
   tabla_distritos <- data.frame(paginas = urls_paginas, urls = str_remove_all(urls_paginas, "https://www.idealista.com|pagina-..\\.htm|pagina-.\\.htm"))
-  tabla_distritos <- merge(distris, tabla_distritos, by = "urls")
+  
+  if (area == "Ciudad" | area == "ciudad") {
+    tabla_distritos <- merge(distris, tabla_distritos, by = "urls")
+    
+  }
   
   tabla_distritos$paginas <- as.character(tabla_distritos$paginas)
   
@@ -151,8 +155,14 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     x <- GET(tabla_distritos$paginas[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))
     links <- x %>% read_html() %>% html_nodes(".item-link") %>% html_attr(name = "href", default = NA)
     
-    links_anuncios <- data.frame(anuncio = paste0("https://www.idealista.com", links), distrito = tabla_distritos$distritos[p])
+    if (area == "Ciudad" | area == "ciudad") {
+      links_anuncios <- data.frame(anuncio = paste0("https://www.idealista.com", links), distrito = tabla_distritos$distritos[p])
+    } else {
+      links_anuncios <- data.frame(anuncio = paste0("https://www.idealista.com", links), distrito = NA)
+    }
+    
     links_anuncios_tot <- rbind(links_anuncios_tot, links_anuncios)
+    
     
     
     print(links_anuncios_tot)
@@ -169,7 +179,7 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
   
   links_anuncios_tot <<- links_anuncios_tot
   
-  line <- data.frame("Titulo", "Distrito", "Barrio", "calle", "Precio", "Precio_m2", "Superficie", "Habitaciones", "Descripcion", "Anunciante", "Agencia", "Url", "fecha")
+  line <- data.frame("Titulo", "Distrito", "Barrio", "calle", "Precio", "Precio_m2", "Superficie", "Habitaciones", "Descripcion", "Anunciante", "Agencia", "Url", "ultima_actualizacion", "fecha")
   
   write.table(line, file = ruta, sep = ",", quote = FALSE, col.names = FALSE, row.names = FALSE, na = "", append = FALSE)
   
@@ -178,8 +188,8 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
   links_anuncios_tot$anuncio <- as.character(links_anuncios_tot$anuncio)
   
   
-  print(paste("Idealisto ha extraido las urls de", p, "anuncios."))
-  print(paste("Ahora Idealisto comenzará a extraer la información de esos", p, "anuncios. Pero antes vamos a descansar durante 30 segundos"))
+  print(paste("Idealisto ha extraido las urls de", n, "anuncios."))
+  print(paste("Ahora Idealisto comenzará a extraer la información de esos", n, "anuncios. Pero antes vamos a descansar durante 30 segundos"))
   
   Sys.sleep(30)
   
@@ -197,6 +207,9 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     agencia <- x %>% read_html() %>% html_nodes(".about-advertiser-name") %>% html_text()
     info <- x %>% read_html() %>% html_nodes(".info-features") %>% html_text()
     descrip <- x %>% read_html() %>% html_nodes(".expandable") %>% html_text()
+    alta <- x %>% read_html() %>% html_nodes("#stats > p") %>% html_text()
+    
+    
     
     if (length(titulo) == 0) {
       titulo <- "Sin título"
@@ -219,8 +232,14 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     }
     
     calle <- ubi[1]
-    distrito <- links_anuncios_tot$distrito[p]
     barrio <- as.character(ubi[str_detect(ubi, pattern = "Barrio ") == TRUE])
+    
+    if (area == "ciudad" | area == "Ciudad") {
+      distrito <- links_anuncios_tot$distrito[p]
+    } else {
+      distrito <- as.character(ubi[str_detect(ubi, pattern = "Distrito") == TRUE])
+      distrito <- str_replace_all(string = distrito, pattern = "Distrito ", replacement = "")
+    }
     
     
     if (length(distrito) == 0) {
@@ -239,7 +258,6 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     metros <- str_replace_all(string = metros, pattern = " m²| |\\.", replacement = "")
     metros <- as.numeric(metros)
     habit <- as.integer(str_replace_all(pattern = " hab.", replacement = "", string = str_extract(pattern = ".hab.|..hab.", string = info)))
-    #distrito <- str_replace_all(string = distrito, pattern = "Distrito ", replacement = "")
     precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = ""))
     descrip <- str_replace_all(descrip, pattern = '\"', "")
     fecha <- Sys.Date()
@@ -247,7 +265,7 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     precio_m2 <- precio/metros
     
     
-    line <- data.frame(titulo, distrito, barrio, calle, precio, precio_m2, metros, habit, descrip, anunciante, agencia, links_anuncios_tot$anuncio[p], fecha)
+    line <- data.frame(titulo, distrito, barrio, calle, precio, precio_m2, metros, habit, descrip, anunciante, agencia, links_anuncios_tot$anuncio[p], alta, fecha)
     print(line)
     
     n <- n - 1
