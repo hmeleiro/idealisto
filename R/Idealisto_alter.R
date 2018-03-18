@@ -258,14 +258,14 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     metros <- str_replace_all(string = metros, pattern = " m²| |\\.", replacement = "")
     metros <- as.numeric(metros)
     habit <- as.integer(str_replace_all(pattern = " hab.", replacement = "", string = str_extract(pattern = ".hab.|..hab.", string = info)))
-    precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = ""))
+    try(precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = "")))
     descrip <- str_replace_all(descrip, pattern = '\"', "")
     fecha <- Sys.Date()
     
-    precio_m2 <- precio/metros
+    try(precio_m2 <- precio/metros)
     
     
-    line <- data.frame(titulo, distrito, barrio, calle, precio, precio_m2, metros, habit, descrip, anunciante, agencia, links_anuncios_tot$anuncio[p], alta, fecha)
+    try(line <- data.frame(titulo, distrito, barrio, calle, precio, precio_m2, metros, habit, descrip, anunciante, agencia, links_anuncios_tot$anuncio[p], alta, fecha))
     print(line)
     
     n <- n - 1
@@ -273,8 +273,7 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     print(paste0("Idealisto lleva descargados el ", round(process, digits = 1),"% de los anuncios."))
     
     
-    write.table(line, file = ruta, sep = ",", append = TRUE, quote = TRUE, col.names = FALSE, row.names = FALSE, na = "")
-    
+    try(write.table(line, file = ruta, sep = ",", append = TRUE, quote = TRUE, col.names = FALSE, row.names = FALSE, na = ""))    
     #########
     
     
