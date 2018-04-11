@@ -99,16 +99,17 @@ vigencia <- function(ruta) {
   df$MenosDe30[df$vigencia <= 30] <- "30 días o menos" 
   df$MenosDe30[is.na(df$vigencia)] <- "Sigue de alta"
   
-  df$cambio_precio <- df$Precio - df$nuevo_precio
+  df$cambio_precio <- df$nuevo_precio - df$Precio
   df$cambio_precio_agrup[df$cambio_precio == 0] <- "Igual" 
-  df$cambio_precio_agrup[df$cambio_precio > 0 & df$cambio_precio <= 150] <- "Aumento de 150€ o menos" 
-  df$cambio_precio_agrup[df$cambio_precio > 150 & df$cambio_precio <= 350] <- "Aumento de entre 151€ y 350€" 
-  df$cambio_precio_agrup[df$cambio_precio > 350 & df$cambio_precio <= 500] <- "Aumento de entre 351€ y 500€" 
-  df$cambio_precio_agrup[df$cambio_precio > 500] <- "Aumento de más de 450€" 
   
-  df$cambio_precio_agrup[df$cambio_precio < 0 & df$cambio_precio >= -50] <- "cambio_precio de 50 o menos" 
-  df$cambio_precio_agrup[df$cambio_precio < -50 & df$cambio_precio >= -100] <- "cambio_precio de entre 51€ y 100€" 
-  df$cambio_precio_agrup[df$cambio_precio < -100] <- "cambio_precio de más de 101€" 
+  df$cambio_precio_agrup[df$cambio_precio < 0 & df$cambio_precio >= -150] <- "Rebaja de 150€ o menos" 
+  df$cambio_precio_agrup[df$cambio_precio < -150 & df$cambio_precio >= -350] <- "Rebaja de entre 151€ y 350€" 
+  df$cambio_precio_agrup[df$cambio_precio < -350 & df$cambio_precio >= -500] <- "Rebaja de entre 351€ y 500€" 
+  df$cambio_precio_agrup[df$cambio_precio < -500] <- "Rebaja de más de 500€" 
+  
+  df$cambio_precio_agrup[df$cambio_precio > 0 & df$cambio_precio <= 50] <- "Aumento de 50€ o menos" 
+  df$cambio_precio_agrup[df$cambio_precio > 50 & df$cambio_precio <= 100] <- "Aumento de entre 51€ y 100€" 
+  df$cambio_precio_agrup[df$cambio_precio > 100] <- "Aumento de más de 101€" 
   
   try(write.csv(x = df, file = paste0("~/","vigencia_",Sys.Date(),".csv")))
   
