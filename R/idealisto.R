@@ -225,9 +225,14 @@ idealisto <- function(url, area, ruta = "~/idealisto.csv") {
     metros <- as.numeric(metros)
     habit <- as.integer(str_replace_all(pattern = " hab.", replacement = "", string = str_extract(pattern = ".hab.|..hab.", string = info)))
     distrito <- str_replace_all(string = distrito, pattern = "Distrito ", replacement = "")
-    precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = ""))
     descrip <- str_replace_all(descrip, pattern = '\"', "")
     fecha <- Sys.Date()
+    
+    if (str_detect(precio, "eur")) {
+      try(precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = "")))
+    } else if (str_detect(precio, "€")) {
+      try(precio <- as.integer(str_replace_all(string = precio, pattern = " €/mes|\\.", replacement = "")))
+    }
     
     precio_m2 <- precio/metros
     
