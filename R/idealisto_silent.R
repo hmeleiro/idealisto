@@ -2,14 +2,14 @@
 #' 
 #' This function scraps idealista (a spanish real estate website) and downloads all the rent ads in the given province, city, disctrict or neighborhood.
 #' 
-#' This is and alternative to idealisto function that has one big for loop instead of a repeat one.
+#' This function is a silent version of idealisto_alter. This means that it will print a less messages. Useful if you want to schedule with cron and want a cleaner log file.
 #' 
 #' @param url An idealista website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.
 #' @param area The type of area you want to scrap. It can take these values: 'Provincia', 'Ciudad', 'Distrito' or 'Barrio'.
 #' @param ruta A valid path in your computer where you want to create the csv file.
 #' @return It returns a csv in the specified path
 #' @export
-idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
+idealisto_silent <- function(url, area, ruta = "~/idealisto_alter.csv") {
   start <- Sys.time()
   
   list.of.packages <- c("stringr", "rvest", "httr")
@@ -71,6 +71,8 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
   
   d <- length(url_distris)
   
+  ### CREA UN ÍNDICE DE PÁGINAS DE CADA SUBAREA
+  print(paste0("Capturando los links a las principales páginas de cada ", subarea, "."))
   repeat {
     links <- paste0("https://www.idealista.com", url_distris[d])
     url_distris_tot <- c(url_distris_tot, links)
@@ -85,12 +87,11 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     url_distris_tot <- url
     url_distris_tot_ <- url
   } else {
-    print(paste("Estos son los links a las páginas principales de cada", subarea, ":"))
-    print(url_distris_tot)
     url_distris_tot_ <- paste0("https://www.idealista.com", url_distris)
   }
   
   
+  print("Capturando los links a todas las páginas de todas las subareas.")
   
   repeat {
     
@@ -99,7 +100,7 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     sig_pag_tot <- c()
     
     repeat {
-      x <- GET(url_distris_tot[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))  ##   Creo q para pasar las páginas en el GET
+      x <- GET(url_distris_tot[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))
       sig_pag <- x %>% read_html() %>% html_nodes(".icon-arrow-right-after") %>% html_attr(name = "href", default = NA)
       
       if (length(sig_pag) == 0) {
@@ -117,7 +118,6 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     }
     
     url_distris_tot <- paste0("https://www.idealista.com", sig_pag_tot)
-    print(url_distris_tot)
     
     if (isTRUE(url_distris_tot == "https://www.idealista.com")) {
       break
@@ -125,14 +125,6 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     
     
     url_distris_tot_ <- c(url_distris_tot_, url_distris_tot)
-    
-    
-    if (area == "Barrio" | area == "barrio") {
-      
-    } else {
-      print(url_distris_tot_)
-      print(paste("Capturando los links de todas las páginas de cada", subarea, "..."))
-    }
     
   }
   
@@ -151,6 +143,9 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
   
   p <- length(tabla_distritos$paginas)
   
+  
+  print("Capturando los links a todos los anuncios...")
+  
   repeat {
     x <- GET(tabla_distritos$paginas[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))
     links <- x %>% read_html() %>% html_nodes(".item-link") %>% html_attr(name = "href", default = NA)
@@ -162,11 +157,6 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     }
     
     links_anuncios_tot <- rbind(links_anuncios_tot, links_anuncios)
-    
-    
-    
-    print(links_anuncios_tot)
-    print("Capturando los links a todos los anuncios...")
     
     p <- p - 1
     if (p == 0) {
@@ -193,9 +183,8 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
   
   Sys.sleep(30)
   
-  
+  print("Comenzamos a extraer los anuncios...")
   start_2 <- Sys.time()
-  
   ###### 
   for (p in 1:length(links_anuncios_tot$anuncio)) {     
     x <- GET(links_anuncios_tot$anuncio[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))
@@ -271,11 +260,8 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     
     
     try(line <- data.frame(titulo, distrito, barrio, calle, precio, precio_m2, metros, habit, descrip, anunciante, agencia, links_anuncios_tot$anuncio[p], alta, fecha))
-    print(line)
     
     n <- n - 1
-    process <- 100 - ((n/length(links_anuncios_tot$anuncio))*100)
-    print(paste0("Idealisto lleva descargados el ", round(process, digits = 1),"% de los anuncios."))
     
     
     try(write.table(line, file = ruta, sep = ",", append = TRUE, quote = TRUE, col.names = FALSE, row.names = FALSE, na = ""))    
@@ -285,7 +271,7 @@ idealisto_alter <- function(url, area, ruta = "~/idealisto_alter.csv") {
     
     if (Sys.time() > start_2 + 420) {
       stop_t <- sample(x = 100:120, size = 1)
-      print(paste("Para que no se nos cabree Idealista vamos a parar la máquina durante", stop_t, "segundos."))
+      #print(paste("Para que no se nos cabree Idealista vamos a parar la máquina durante", stop_t, "segundos."))
       Sys.sleep(time = stop_t)
       start_2 <- Sys.time()
     }
