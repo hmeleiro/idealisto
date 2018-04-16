@@ -3,12 +3,13 @@
 #' This function scraps idealista (a spanish real estate website) and downloads all the rent ads of a given city district.
 #' 
 #' 
-#' @param url character. An idealista website url that links to the city district you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid-provincia/'.
+#' @param url character. An idealista website url that links to the city district you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/barajas/'.
+#' @param ads character. Specify if the url links to rent ads or for sale ads. The argument accepts the keys "rent" or "sale".
 #' @param ruta character. A valid path in your computer where you want to create the csv file.
 #' @param silent logical. If TRUE it will print a less messages. Useful if you want to schedule with cron and want a cleaner log file. The default is FALSE.
 #' @return It returns a csv in the specified path
 #' @export
-get_distrito <- function(url, ruta = "~/idealisto_distrito.csv", silent = FALSE) {
+get_distrito <- function(url, ads, ruta = "~/idealisto_distrito.csv", silent = FALSE) {
   start <- Sys.time()
   
   # Creo el csv vacío
@@ -226,11 +227,28 @@ get_distrito <- function(url, ruta = "~/idealisto_distrito.csv", silent = FALSE)
     
     fecha <- Sys.Date()
     
-    if (str_detect(precio, "eur") == TRUE) {
-      try(precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = "")))
-    } else if (str_detect(precio, "€") == TRUE) {
-      try(precio <- as.integer(str_replace_all(string = precio, pattern = " €/mes|\\.", replacement = "")))
+    precio <- precio[1]
+    
+    ## Bucle para limpiar el campo del precio en función si es anuncio de venta o de alquiler
+    
+    if (ads == "rent") {
+      
+      if (str_detect(precio, "eur") == TRUE) {
+        try(precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = "")))
+      } else if (str_detect(precio, "€") == TRUE) {
+        try(precio <- as.integer(str_replace_all(string = precio, pattern = " €/mes|\\.", replacement = "")))
+      }
+      
+    } else if (ads == "sale") {
+      
+      if (str_detect(precio, "eur") == TRUE) {
+        try(precio <- as.integer(str_replace_all(string = precio, pattern = " eur|\\.", replacement = ""))) 
+      } else if (str_detect(precio, "€") == TRUE) {
+        try(precio <- as.integer(str_replace_all(string = precio, pattern = " €|\\.", replacement = "")))
+      }
     }
+    
+    ####
     
     try(precio_m2 <- precio/metros)
     

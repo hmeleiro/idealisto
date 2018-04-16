@@ -4,10 +4,12 @@
 \alias{get_provincia}
 \title{Scrap idealista website.}
 \usage{
-get_provincia(url, ruta = "~/idealisto_prov.csv", silent = FALSE)
+get_provincia(url, ads, ruta = "~/idealisto_prov.csv", silent = FALSE)
 }
 \arguments{
 \item{url}{character. An idealista website url that links to the province you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/zaragoza-provincia/'.}
+
+\item{ads}{character. Specify if the url links to rent ads or for sale ads. The argument accepts the keys "rent" or "sale".}
 
 \item{ruta}{character. A valid path in your computer where you want to create the csv file.}
 
