@@ -4,9 +4,9 @@
 #' 
 #' 
 #' @param url character. An idealista website url that links to the city you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/barcelona-barcelona/'.
-#' @param ads character. Specify if the url links to rent ads or for sale ads. The argument accepts the keys "rent" or "sale".
+#' @param ads character. Specify if the url links to rent ads or for sale ads. The argument accepts the following strings: "rent" or "sale".
 #' @param ruta character. A valid path in your computer where you want to create the csv file.
-#' @param silent logical. If TRUE it will print a less messages. Useful if you want to schedule with cron and want a cleaner log file. The default is FALSE.
+#' @param silent logical. If TRUE it will print less messages. Useful if you want to schedule with cron and want a cleaner log file. The default is FALSE.
 #' @return It returns a csv in the specified path
 #' @export
 get_city <- function(url, ads, ruta = "~/idealisto_city.csv", silent = FALSE) {
@@ -51,7 +51,7 @@ get_city <- function(url, ads, ruta = "~/idealisto_city.csv", silent = FALSE) {
   
   
   if (silent == TRUE) {
-    print("Capturando los links a las páginas principales de cada barrio.")
+    print("Capturando los links a las páginas principales de cada distrito.")
   }
   
   for (d in 1:length(url_distris)) {
@@ -70,7 +70,7 @@ get_city <- function(url, ads, ruta = "~/idealisto_city.csv", silent = FALSE) {
   
   
   if (silent == TRUE) {
-    print("Capturando los links a todas las páginas de cada barrio...")
+    print("Capturando los links a todas las páginas de cada distrito...")
   }
   
   repeat {
@@ -111,8 +111,8 @@ get_city <- function(url, ads, ruta = "~/idealisto_city.csv", silent = FALSE) {
     
     
     if (silent == FALSE) {
-      print(url_barrios_tot_)
-      print(paste("Capturando los links de todas las páginas de cada barrio..."))
+      print(url_distris_tot)
+      print(paste("Capturando los links de todas las páginas de cada distrito..."))
     }
     
   }
