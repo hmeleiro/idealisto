@@ -12,9 +12,9 @@ install_github("meneos/idealisto")
 
 # get_ functions
 
-Idealista differentiates between the type of area being scraped. If the are you want to download is a city you need to use ```get_city()```, if is a city district you'll need ```get_distrito()``` and of you want a whole province you'll need ```get_provincia()```.
+Idealisto differentiates between the type of area being scraped. If the are you want to download is a city you need to use ```get_city()```, if is a city district you'll need ```get_distrito()``` and of you want a whole province you'll need ```get_provincia()```.
 
-If the area you need has less than 1.800 ads you can use a faster function: ```get_fast()```
+If the area you need includes 1.800 or less ads you can use a faster function: ```get_fast()```
 
 # Example
 
