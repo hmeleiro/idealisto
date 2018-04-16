@@ -3,4 +3,4 @@
 .RData
 .Ruserdata
 idealisto.Rproj
-idealisto_venta.R
+R/idealisto_venta.R
