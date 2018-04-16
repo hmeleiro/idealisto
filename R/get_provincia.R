@@ -1,13 +1,21 @@
 #' Scrap idealista website.
 #' 
-#' This function scraps idealista (a spanish real estate website) and downloads a maximum of 1.800 rent ads in the given province, city, district or neighborhood. So if you want to scrap an area that has more than 1.800 ads use idealisto function.
-#' @param url An idealista website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.
-#' @param ruta A valid path in your computer where you want to create the csv file.
+#' This function scraps idealista (a spanish real estate website) and downloads all the rent ads of a given province
+#' 
+#' 
+#' @param url character. An idealista website url that links to the province you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/zaragoza-provincia/'.
+#' @param ruta character. A valid path in your computer where you want to create the csv file.
+#' @param silent logical. If TRUE it will print a less messages. Useful if you want to schedule with cron and want a cleaner log file. The default is FALSE.
 #' @return It returns a csv in the specified path
 #' @export
-idealisto_fast <- function(url, ruta = "~/idealisto_fast.csv") {
+get_provincia <- function(url, ruta = "~/idealisto_prov.csv", silent = FALSE) {
   start <- Sys.time()
   
+  # Creo el csv vacío
+  line <- data.frame("Titulo", "Zona", "Distrito", "Barrio", "calle", "Precio", "Precio_m2", "Superficie", "Habitaciones", "Descripcion", "Anunciante", "Agencia", "Url", "ultima_actualizacion", "fecha")
+  write.table(line, file = ruta, sep = ",", quote = FALSE, col.names = FALSE, row.names = FALSE, na = "", append = FALSE)
+  
+  # instalo los paquetes necesarios en el caso de que no lo estén y los cargo
   list.of.packages <- c("stringr", "rvest", "httr")
   new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
   if(length(new.packages)>0) {install.packages(new.packages)}
@@ -16,6 +24,7 @@ idealisto_fast <- function(url, ruta = "~/idealisto_fast.csv") {
   library(rvest)
   library(httr)
   
+  # Creo los headers
   desktop_agents <-  c('Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
                        'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
@@ -29,44 +38,120 @@ idealisto_fast <- function(url, ruta = "~/idealisto_fast.csv") {
   
   
   
-  url_base <- url       ## Defino la url base
-  
-  #### CALCULO CUANTAS PÁGINAS TIENE EL AREA SOLICITADA
   x <- GET(url, add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))
-  anuncios <- x %>% read_html() %>% html_nodes(".h1-simulated") %>% html_text()
-  anuncios <- str_remove(anuncios, "\\.")
-  q <- round(as.numeric(anuncios)/30)
+  url_zonas <- x %>% read_html() %>% html_nodes(".breadcrumb-subitems li ul li a") %>% html_attr(name = "href")
+  zonas <- x %>% read_html() %>% html_nodes(".breadcrumb-subitems li ul li") %>% html_text()
   
-  ####  CREO EL ÍNDICE DE PÁGINAS
-  times <- 1:q                ## Creo un vector con los números del 1 al n para cambiar las páginas de la web
-  url <- c(replicate(expr = paste0(url_base, "pagina-", times,".htm"), n = 1))  ##Construyo el string con las urls definitivas. Una para cada página a scrapear
-  print(url)
-  #url <- c(url, replicate(expr = paste0(url_base), n = 1))
+  zonas <- data.frame(urls = url_zonas, zonas = zonas)
+  zonas
+  url_zonas_tot <- c()
   
   
-  links_anuncios_tot <- c()
   
-  #### EXTRAIGO LOS LINKS DE TODOS LOS ANUNCIOS DEL AREA
-  for (p in 1:length(url)) {
-    x <- GET(url[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))
-    links <- x %>% read_html() %>% html_nodes(".item-link") %>% html_attr(name = "href", default = NA)
+  if (silent == TRUE) {
+    print("Capturando los links a las páginas principales de cada barrio.")
+  }
+  
+  for (d in 1:length(url_zonas)) {
+    links <- paste0("https://www.idealista.com", url_zonas[d])
+    url_zonas_tot <- c(url_zonas_tot, links)
+  }
+  
+  if (silent == FALSE) {
+    print(paste("Estos son los links a las páginas principales de cada zona"))
+    print(url_zonas_tot)
+  }
+  
+  url_zonas_tot_ <- paste0("https://www.idealista.com", url_zonas)
+  
+  
+  
+  
+  if (silent == TRUE) {
+    print("Capturando los links a todas las páginas de cada barrio...")
+  }
+  
+  repeat {
     
-    links_anuncios <- paste0("https://www.idealista.com", links)
-    links_anuncios_tot <- c(links_anuncios_tot, links_anuncios)
-    links_anuncios_tot <- unique(links_anuncios_tot)
+    p <- length(url_zonas_tot)
     
-    print(links_anuncios_tot)
-    print("Capturando los links a todos los anuncios...")
+    sig_pag_tot <- c()
+    
+    repeat {
+      x <- GET(url_zonas_tot[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))  ##   Creo q para pasar las páginas en el GET
+      sig_pag <- x %>% read_html() %>% html_nodes(".icon-arrow-right-after") %>% html_attr(name = "href", default = NA)
+      
+      if (length(sig_pag) == 0) {
+        sig_pag <- NA
+      } else {
+        sig_pag_tot <- c(sig_pag, sig_pag_tot)
+      }
+      
+      p <- p - 1
+      
+      if (p == 0) {
+        break
+      }
+      
+    }
+    
+    url_zonas_tot <- paste0("https://www.idealista.com", sig_pag_tot)
+    
+    if (silent == FALSE) {
+      print(url_zonas_tot)
+    }
+    
+    if (isTRUE(url_zonas_tot == "https://www.idealista.com")) {
+      break
+    }
+    
+    url_zonas_tot_ <- c(url_zonas_tot_, url_zonas_tot)
+    
+    
+    if (silent == FALSE) {
+      print(url_zonas_tot_)
+      print(paste("Capturando los links de todas las páginas de cada barrio..."))
+    }
+    
   }
   
   
+  
+  urls_paginas <- unique(url_zonas_tot_[url_zonas_tot_ != "https://www.idealista.com"])
+  
+  links_anuncios_tot <- data.frame(anuncio = NA, zona = NA)
+  
+  tabla_zona <- data.frame(paginas = urls_paginas, urls = str_remove_all(urls_paginas, "https://www.idealista.com|pagina-..\\.htm|pagina-.\\.htm"))
+  
+  tabla_zona <- merge(zonas, tabla_zona, by = "urls")
+  
+  tabla_zona$paginas <- as.character(tabla_zona$paginas)
+  
+  
+  for (p in 1:length(tabla_zona$paginas)) {
+    x <- GET(tabla_zona$paginas[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))
+    links <- x %>% read_html() %>% html_nodes(".item-link") %>% html_attr(name = "href", default = NA)
+    
+    links_anuncios <- data.frame(anuncio = paste0("https://www.idealista.com", links), zona = tabla_zona$zonas[p])
+    
+    links_anuncios_tot <- rbind(links_anuncios_tot, links_anuncios)
+    
+    if (silent == FALSE) {
+      print(links_anuncios_tot)
+      print("Capturando los links a todos los anuncios...")
+    }
+  }
+  
+  links_anuncios_tot$zona <- str_trim(links_anuncios_tot$zona, "both")
+  links_anuncios_tot <- unique(links_anuncios_tot)
+  links_anuncios_tot <- links_anuncios_tot[-1,]
+  
   links_anuncios_tot <<- links_anuncios_tot
   
-  line <- data.frame("Titulo", "Distrito", "Barrio", "calle", "Precio", "Precio_m2", "Superficie", "Habitaciones", "Descripcion", "Anunciante", "Agencia", "Url", "fecha")
+  n <- length(links_anuncios_tot$anuncio)
   
-  write.table(line, file = ruta, sep = ",", quote = FALSE, col.names = FALSE, row.names = FALSE, na = "")
+  links_anuncios_tot$anuncio <- as.character(links_anuncios_tot$anuncio)
   
-  n <- length(links_anuncios_tot)
   
   print(paste("Idealisto ha extraido las urls de", n, "anuncios."))
   print(paste("Ahora Idealisto comenzará a extraer la información de esos", n, "anuncios. Pero antes vamos a descansar durante 30 segundos"))
@@ -76,16 +161,14 @@ idealisto_fast <- function(url, ruta = "~/idealisto_fast.csv") {
   
   start_2 <- Sys.time()
   
-  
-  
-  ######  Empieza a scraper cada uno de los anuncios
+  ###### 
   
   if (silent == TRUE) {
     print("Comienza la extracción de los anuncios...")
   }
   
-  for (p in 1:length(links_anuncios_tot)) {     
-    x <- GET(links_anuncios_tot[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))
+  for (p in 1:length(links_anuncios_tot$anuncio)) {     
+    x <- GET(links_anuncios_tot$anuncio[p], add_headers('user-agent' = desktop_agents[sample(1:10, 1)]))
     
     titulo <- x %>% read_html() %>% html_nodes(".main-info__title-main") %>% html_text()
     precio <- x %>% read_html() %>% html_nodes(".h1-simulated") %>% html_text()
@@ -144,6 +227,9 @@ idealisto_fast <- function(url, ruta = "~/idealisto_fast.csv") {
       anunciante <- "Particular"
     }
     
+    
+    zona <- links_anuncios_tot$zona[p]
+    
     calle <- ubi[1]
     barrio <- as.character(ubi[str_detect(ubi, pattern = "Barrio ") == TRUE])
     
@@ -151,7 +237,7 @@ idealisto_fast <- function(url, ruta = "~/idealisto_fast.csv") {
     distrito <- str_replace_all(string = distrito, pattern = "Distrito ", replacement = "")
     
     if (length(distrito) == 0) {
-      distrito <- str_replace(string = links_anuncios_tot[p], pattern = "https://www.idealista.com/alquiler-viviendas/", replacement = "")
+      distrito <- NA
     }
     
     if (length(barrio) == 0) {
@@ -163,16 +249,15 @@ idealisto_fast <- function(url, ruta = "~/idealisto_fast.csv") {
     }
     
     
-    try(line <- data.frame(titulo[1], distrito[1], barrio[1], calle[1], precio[1], precio_m2[1], metros[1], habit[1], descrip[1], anunciante[1], agencia[1], links_anuncios_tot[p], alta[1], fecha[1]))
+    try(line <- data.frame(titulo[1], zona[1], distrito[1], barrio[1], calle[1], precio[1], precio_m2[1], metros[1], habit[1], descrip[1], anunciante[1], agencia[1], links_anuncios_tot$anuncio[p], alta[1], fecha[1]))
     
     if (silent == FALSE) {
       print(line)
     }
     
-    
     if (silent == FALSE) {
       n <- n - 1
-      process <- 100 - ((n/length(links_anuncios_tot))*100)
+      process <- 100 - ((n/length(links_anuncios_tot$anuncio))*100)
       print(paste0("Idealisto lleva descargados el ", round(process, digits = 1),"% de los anuncios."))
     }
     
@@ -193,7 +278,7 @@ idealisto_fast <- function(url, ruta = "~/idealisto_fast.csv") {
   }
   
   end <- Sys.time()
-  diff <- difftime(end, start, units = "auto")
-  print(paste("Idealisto ha descargado los", length(links_anuncios_tot), "anuncios."))
-  print(diff)
+  diff <- end - start
+  print(paste("Idealisto ha descargado los", length(links_anuncios_tot$anuncio), "anuncios"))
+  print(round(diff, digits = 1))
 }
