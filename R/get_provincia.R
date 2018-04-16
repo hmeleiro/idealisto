@@ -68,7 +68,7 @@ get_provincia <- function(url, ruta = "~/idealisto_prov.csv", silent = FALSE) {
   
   
   if (silent == TRUE) {
-    print("Capturando los links a todas las páginas de cada barrio...")
+    print("Capturando los links a todas las páginas de cada zona...")
   }
   
   repeat {
@@ -110,7 +110,7 @@ get_provincia <- function(url, ruta = "~/idealisto_prov.csv", silent = FALSE) {
     
     if (silent == FALSE) {
       print(url_zonas_tot_)
-      print(paste("Capturando los links de todas las páginas de cada barrio..."))
+      print(paste("Capturando los links de todas las páginas de cada zona..."))
     }
     
   }

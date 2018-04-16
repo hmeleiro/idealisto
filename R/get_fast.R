@@ -5,7 +5,7 @@
 #' @param ruta A valid path in your computer where you want to create the csv file.
 #' @return It returns a csv in the specified path
 #' @export
-idealisto_fast <- function(url, ruta = "~/idealisto_fast.csv") {
+get_fast <- function(url, ruta = "~/idealisto_fast.csv") {
   start <- Sys.time()
   
   list.of.packages <- c("stringr", "rvest", "httr")
