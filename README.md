@@ -10,27 +10,38 @@ library(devtools)
 install_github("meneos/idealisto")
 ```
 
+# get_ functions
+
+Idealista differentiates between the type of area being scraped. If the are you want to download is a city you need to use ```get_city()```, if is a city district you'll need ```get_distrito()``` and of you want a whole province you'll need ```get_provincia()```.
+
+If the area you need has less than 1.800 ads you can use a faster function: ```get_fast()```
+
 # Example
 
-If you are interested in a Madrid disctrict in particular just type:
+If you are interested in a city disctrict in particular just type:
 ```
-idealisto("https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/", "distrito", "VALID-PATH-IN-YOUR-COMPUTER")
-
+get_distrito("https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/")
 ```
 
 To download a whole city (this may take hours in the cases of Madrid or Barcelona) type:
 ```
-idealisto("https://www.idealista.com/alquiler-viviendas/madrid-madrid/", "ciudad", "VALID-PATH-IN-YOUR-COMPUTER")
-
+get_city("https://www.idealista.com/alquiler-viviendas/madrid-madrid/")
 ```
 
+If you want to specify a path in your computer where the csv will be created yo can add a second character argument (by default the csv will be created in the working directory):
+
+```
+get_city("https://www.idealista.com/alquiler-viviendas/madrid-madrid/", "VALID-PATH-IN-YOUR-COMPUTER")
+```
 
 # vigencia() function
 The vigencia function gives useful data if you call it weeks later on the results of the idealisto function. It adds columns to the data frame of a previous idealisto search related to the current state of the ads: are the ads is still online, do they have a new price, if the ads are no longer online it will tell how many days passed until it went offline, etc...
 
 ```
-Madrid <- read.csv("VALID-PATH-IN-YOUR-COMPUTER-TO-A-IDEALISTO-CSV")
-
-vigencia(Madrid)
-
+vigencia("VALID-PATH-IN-YOUR-COMPUTER-TO-A-IDEALISTO-CSV")
 ```
+
+
+# Fotocasa
+
+The real estate web [fotocasa.com](https://www.fotocasa.es/es/) has it's own function but it may not work correctly.
