@@ -151,7 +151,7 @@ get_fast <- function(url, ruta = "~/idealisto_fast.csv") {
     distrito <- str_replace_all(string = distrito, pattern = "Distrito ", replacement = "")
     
     if (length(distrito) == 0) {
-      distrito <- str_replace(string = links_anuncios_tot[p], pattern = "https://www.idealista.com/alquiler-viviendas/", replacement = "")
+      distrito <- NA
     }
     
     if (length(barrio) == 0) {

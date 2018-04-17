@@ -197,7 +197,7 @@ get_city <- function(url, ads, ruta = "~/idealisto_city.csv", silent = FALSE) {
     
     fecha <- Sys.Date()
     
-    ## Bucle para limpiar el campo del precio en función si es anuncio de venta o de alquiler
+    ## Bucle para limpiar el campo del precio en función de si es anuncio de venta o de alquiler
     
     if (ads == "rent") {
       
@@ -251,7 +251,7 @@ get_city <- function(url, ads, ruta = "~/idealisto_city.csv", silent = FALSE) {
     distrito <- str_replace_all(string = distrito, pattern = "Distrito ", replacement = "")
     
     if (length(distrito) == 0) {
-      distrito <- str_replace(string = links_anuncios_tot[p], pattern = "https://www.idealista.com/alquiler-viviendas/", replacement = "")
+      distrito <- NA
     }
     
     if (length(barrio) == 0) {
