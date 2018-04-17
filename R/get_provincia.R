@@ -196,9 +196,14 @@ get_provincia <- function(url, ads, ruta = "~/idealisto_prov.csv", silent = FALS
     
     fecha <- Sys.Date()
     
+    if (length(precio) == 0) {
+      precio <- NA
+    }
+    
     ## Bucle para limpiar el campo del precio en función si es anuncio de venta o de alquiler
     
-    if (ads == "rent") {
+    
+    try(if (ads == "rent") {
       
       if (str_detect(precio, "eur") == TRUE) {
         try(precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = "")))
@@ -213,7 +218,7 @@ get_provincia <- function(url, ads, ruta = "~/idealisto_prov.csv", silent = FALS
       } else if (str_detect(precio, "€") == TRUE) {
         try(precio <- as.integer(str_replace_all(string = precio, pattern = " €|\\.", replacement = "")))
       }
-    }
+    })
     
     ####
     
@@ -223,10 +228,6 @@ get_provincia <- function(url, ads, ruta = "~/idealisto_prov.csv", silent = FALS
     
     if (length(titulo) == 0) {
       titulo <- "Sin título"
-    }
-    
-    if (length(precio) == 0) {
-      precio <- "Sin precio"
     }
     
     if (length(descrip) == 0) {

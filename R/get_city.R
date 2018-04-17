@@ -197,9 +197,10 @@ get_city <- function(url, ads, ruta = "~/idealisto_city.csv", silent = FALSE) {
     
     fecha <- Sys.Date()
     
-    ## Bucle para limpiar el campo del precio en función de si es anuncio de venta o de alquiler
+    ## Bucle para limpiar el campo del precio en función si es anuncio de venta o de alquiler
     
-    if (ads == "rent") {
+    
+    try(if (ads == "rent") {
       
       if (str_detect(precio, "eur") == TRUE) {
         try(precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = "")))
@@ -214,7 +215,7 @@ get_city <- function(url, ads, ruta = "~/idealisto_city.csv", silent = FALSE) {
       } else if (str_detect(precio, "€") == TRUE) {
         try(precio <- as.integer(str_replace_all(string = precio, pattern = " €|\\.", replacement = "")))
       }
-    }
+    })
     
     ####
     
@@ -227,7 +228,7 @@ get_city <- function(url, ads, ruta = "~/idealisto_city.csv", silent = FALSE) {
     }
     
     if (length(precio) == 0) {
-      precio <- "Sin precio"
+      precio <- NA
     }
     
     if (length(descrip) == 0) {

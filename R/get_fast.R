@@ -2,10 +2,11 @@
 #' 
 #' This function scraps idealista (a spanish real estate website) and downloads a maximum of 1.800 rent ads in the given province, city, district or neighborhood. So if you want to scrap an area that has more than 1.800 ads use idealisto function.
 #' @param url An idealista website url that links to the area you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/arganzuela/'.
+#' @param ads character. Specify if the url links to rent ads or for sale ads. The argument accepts the following strings: "rent" or "sale".
 #' @param ruta A valid path in your computer where you want to create the csv file.
 #' @return It returns a csv in the specified path
 #' @export
-get_fast <- function(url, ruta = "~/idealisto_fast.csv") {
+get_fast <- function(url, ads, ruta = "~/idealisto_fast.csv") {
   start <- Sys.time()
   
   list.of.packages <- c("stringr", "rvest", "httr")
@@ -112,11 +113,27 @@ get_fast <- function(url, ruta = "~/idealisto_fast.csv") {
     
     fecha <- Sys.Date()
     
-    if (str_detect(precio, "eur") == TRUE) {
-      try(precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = "")))
-    } else if (str_detect(precio, "€") == TRUE) {
-      try(precio <- as.integer(str_replace_all(string = precio, pattern = " €/mes|\\.", replacement = "")))
-    }
+    ## Bucle para limpiar el campo del precio en función si es anuncio de venta o de alquiler
+    
+    
+    try(if (ads == "rent") {
+      
+      if (str_detect(precio, "eur") == TRUE) {
+        try(precio <- as.integer(str_replace_all(string = precio, pattern = " eur/mes|\\.", replacement = "")))
+      } else if (str_detect(precio, "€") == TRUE) {
+        try(precio <- as.integer(str_replace_all(string = precio, pattern = " €/mes|\\.", replacement = "")))
+      }
+      
+    } else if (ads == "sale") {
+      
+      if (str_detect(precio, "eur") == TRUE) {
+        try(precio <- as.integer(str_replace_all(string = precio, pattern = " eur|\\.", replacement = ""))) 
+      } else if (str_detect(precio, "€") == TRUE) {
+        try(precio <- as.integer(str_replace_all(string = precio, pattern = " €|\\.", replacement = "")))
+      }
+    })
+    
+    ####
     
     try(precio_m2 <- precio/metros)
     
@@ -127,7 +144,7 @@ get_fast <- function(url, ruta = "~/idealisto_fast.csv") {
     }
     
     if (length(precio) == 0) {
-      precio <- "Sin precio"
+      precio <- NA
     }
     
     if (length(descrip) == 0) {
