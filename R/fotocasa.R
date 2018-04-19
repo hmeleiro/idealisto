@@ -55,7 +55,7 @@ fotocasa <- function(url, ruta = "~/fotocasa.csv") {
                      "Precio_m2",
                      "Metros",
                      "Habitaciones",
-                     "Baños",
+                     "Banhos",
                      "Planta",
                      "Descripción",
                      "anunciante",
@@ -94,13 +94,13 @@ fotocasa <- function(url, ruta = "~/fotocasa.csv") {
     }
     
     
-    baños <- x %>% read_html() %>% html_nodes("#litBaths") %>% html_text()
-    baños <- str_remove_all(baños, "baños")
-    baños <- str_remove_all(baños, "baño")
-    baños <- as.numeric(baños)
+    banhos <- x %>% read_html() %>% html_nodes("#litBaths") %>% html_text()
+    banhos <- str_remove_all(banhos, "banhos")
+    banhos <- str_remove_all(banhos, "banho")
+    banhos <- as.numeric(banhos)
     
-    if(length(baños) == 0) {
-      baños <- NA
+    if(length(banhos) == 0) {
+      banhos <- NA
     }
     
     rooms <- x %>% read_html() %>% html_nodes("#litRooms") %>% html_text()
@@ -188,7 +188,7 @@ fotocasa <- function(url, ruta = "~/fotocasa.csv") {
                        precio_m2,
                        metros, 
                        rooms,
-                       baños,
+                       banhos,
                        planta,
                        descrip,
                        anunciante,
