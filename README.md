@@ -45,3 +45,8 @@ vigencia("VALID-PATH-IN-YOUR-COMPUTER-TO-A-IDEALISTO-CSV")
 # Fotocasa
 
 The real estate web [fotocasa.com](https://www.fotocasa.es/es/) has it's own function but it may not work correctly.
+
+
+# Windows
+
+There is a problem with windows involving the "€" currency symbol. It will be solved soon.
