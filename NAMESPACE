@@ -3,7 +3,6 @@
 export(fotocasa)
 export(get_city)
 export(get_distrito)
-export(get_distrito_)
 export(get_fast)
 export(get_provincia)
 export(vigencia)
