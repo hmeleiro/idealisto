@@ -9,11 +9,11 @@ get_distrito(url, ads, ruta = "~/idealisto_distrito.csv", silent = FALSE)
 \arguments{
 \item{url}{character. An idealista website url that links to the city district you want to scrap, e.g. 'https://www.idealista.com/alquiler-viviendas/madrid/barajas/'.}
 
-\item{ads}{character. Specify if the url links to rent ads or for sale ads. The argument accepts the keys "rent" or "sale".}
+\item{ads}{character. Specify if the url links to rent ads or for sale ads. The argument accepts the following strings: "rent" or "sale".}
 
 \item{ruta}{character. A valid path in your computer where you want to create the csv file.}
 
-\item{silent}{logical. If TRUE it will print a less messages. Useful if you want to schedule with cron and want a cleaner log file. The default is FALSE.}
+\item{silent}{logical. If TRUE it will print less messages. Useful if you want to schedule with cron and want a cleaner log file. The default is FALSE.}
 }
 \value{
 It returns a csv in the specified path
