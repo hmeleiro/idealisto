@@ -14,7 +14,7 @@ get_distrito_ <- function(url, ads, ruta = "~/idealisto_distrito.csv", silent = 
   
   # Creo el csv vacío
   line <- data.frame("Titulo", "Distrito", "Barrio", "calle", "Precio", "Precio_m2", "Superficie", "Habitaciones", "Descripcion", "Anunciante", "Agencia", "Url", "ultima_actualizacion", "fecha")
-  write.table(line, file = ruta, sep = ",", quote = FALSE, col.names = FALSE, row.names = FALSE, na = "", append = FALSE)  
+  write.table(line, file = ruta, sep = ",", quote = FALSE, col.names = FALSE, row.names = FALSE, na = "", append = FALSE, fileEncoding = "UTF-8")  
   
   
   # instalo los paquetes necesarios en el caso de que no lo estén y los cargo
@@ -310,7 +310,7 @@ get_distrito_ <- function(url, ads, ruta = "~/idealisto_distrito.csv", silent = 
     }
     
     
-    try(write.table(line, file = ruta, sep = ",", append = TRUE, quote = TRUE, col.names = FALSE, row.names = FALSE, na = ""))    
+    try(write.table(line, file = ruta, sep = ",", append = TRUE, quote = TRUE, col.names = FALSE, row.names = FALSE, na = "",fileEncoding = "UTF-8")) 
     #########
     
     
