@@ -1,3 +1,6 @@
+## WARNING:
+idealista has blocked this scraper. For the moment idealisto does not work.
+
 # What is idealisto?
 Idealisto is a web scrapper for the spanish real estate website [Idealista.com](https://www.idealista.com/). It downloads rent ads and creates a csv with the data.
 
